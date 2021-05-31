@@ -1,27 +1,31 @@
--- query 1 : all pending requests [TRIVIAL]
+-- Query 1 : all pending requests [TRIVIAL]
 select requ_id, requester_id, reciever_id
 from friendshiprequest
 where approved is null;
+-- Result: 6616 rows in 6.427 sec
 
--- query 2 : most active (more then X notifications) profiles [TRIVIAL]
+-- Query 2 : most active (more then X notifications) profiles [TRIVIAL]
 select profile_id, first_name, last_name, count(*) as notf_num
 from notification N natural join afeder.profile P
 group by profile_id, first_name, last_name
 having count(*) > 5;
+-- Result: 166 rows in 6.535 sec
 
--- query 3 : most recommended profiles [TRIVIAL]
+-- Query 3 : most recommended profiles [TRIVIAL]
 select offerid, first_name, last_name, count(*) as rec_num
 from friendshipsuggestion FS join afeder.profile P on offerid = profile_id
 group by offerid, first_name, last_name
 having count(*) > 5;
+-- Result: 156 rows in 6.663 sec
 
--- query 4 : most desprate profiles [TRIVIAL]
+-- Query 4 : most desprate profiles [TRIVIAL]
 select requester_id, first_name, last_name, count(*) as req_num
 from friendshiprequest FR join afeder.profile P on requester_id = profile_id
 group by requester_id, first_name, last_name
 having count(*) > 5;
+-- Result: 173 rows in 6.752 sec
 
--- query 5 : all good suggestions
+-- Query 5 : all good suggestions
 select FS.SUGGESTIONID, 
        FS.RECIEVERID, 
        P1.FIRST_NAME as RECIEVER_FNAME, 
@@ -40,8 +44,9 @@ where exists (select *
               where FS.RECIEVERID = FR.REQUESTER_ID 
                     and FS.OFFERID = FR.RECIEVER_ID
                     and FR.Approved = 1);
+-- Result: 240 rows in 6.883 sec
 
--- query 6 : all watched notifications on friend request/suggestion
+-- Query 6 : all watched notifications on friend request/suggestion
 select *
 from notification N
 where N.Watched = 1 and
@@ -50,25 +55,21 @@ where N.Watched = 1 and
                        union
                        (select FS.RECIEVERID
                         from friendshipsuggestion FS));
+-- Result: 9807 rows in 12.549 sec
 
--- query 7 : all popular profiles - more then 5 requests
+-- Query 7 : all popular profiles - more then 5 requests
 select FR.RECIEVER_ID, first_name, last_name, count(*) as req_num
 from friendshiprequest FR join afeder.profile P on FR.RECIEVER_ID = P.PROFILE_ID
 group by FR.RECIEVER_ID, first_name, last_name
 having count(*) > 5;
+-- Result: 176 rows in 12.624 sec
 
----- query 8 : suspicious activity
+---- Query 8 : suspicious activity
 select P.profile_id, first_name, last_name
 from afeder.profile P
 where P.GENDER = 'M' and
       (select count(*)
        from friendshiprequest FR join afeder.profile P1 on FR.RECIEVER_ID = P1.PROFILE_ID
        where FR.REQUESTER_ID = P.PROFILE_ID and P1.GENDER = 'F') >= 3
-
-
-
-
-
-
-                       
+-- Result: 114 rows in 12.950 sec
 
