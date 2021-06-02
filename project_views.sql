@@ -23,7 +23,7 @@ where exists (select *
 create view notification_stats as
 select profile_id, first_name, last_name,
        count(notification_id) as total_notf,
-       sum(watched) as total_watched,
+       sum(watched) as total_watched
 from afeder.profile P
      natural left outer join
      notification N
