@@ -24,7 +24,7 @@ select offerid as Offer_Id,
        last_name as Last_Name,
        count(*) as Request_Amount
 from friendshipsuggestion FS
-       join feder.profile P
+       join afeder.profile P
        on (offerid = profile_id)
 group by offerid, first_name, last_name
 having count(*) > 5;
